@@ -76,13 +76,14 @@
     "object-curly-newline": "off",
     "no-duplicate-imports": "error",
     "no-var": "error",
-    "no-unused-vars": "error",
+    "no-unused-vars": "warn",
     "react/no-children-prop": "off",
     "react/jsx-one-expression-per-line": "off",
     "no-tabs": "off",
     "multiline-ternary": "off",
     "comma-dangle": "off",
     "func-names": "warn",
-    "react/function-component-definition": "off"
-    }
+    "react/function-component-definition": "off",
+    "import/named": "off"  
+  }
 }
