@@ -7,11 +7,13 @@
     ],
     "parser": "@babel/eslint-parser",
     "parserOptions": {
-      "requireConfigFile": false
+      "requireConfigFile": false,
+      "babelOptions": {
+        "presets": ["@babel/preset-react"]
+     }
     },
     "plugins": [
-        "react",
-        "jsx"
+        "react"
     ],
     "rules": {
         "indent": "off",
