@@ -1,20 +1,17 @@
 {
     "env": {
-        "browser": true,
-        "es2021": false
+        "browser": true
     },
     "extends": [
         "airbnb"
     ],
+    "parser": "@babel/eslint-parser",
     "parserOptions": {
-        "ecmaFeatures": {
-            "jsx": true
-        },
-        "ecmaVersion": 2015,
-        "sourceType": "module"
+      "requireConfigFile": false
     },
     "plugins": [
-        "react"
+        "react",
+        "jsx"
     ],
     "rules": {
         "indent": "off",
