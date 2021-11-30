@@ -58,7 +58,8 @@ export const authSlice = createSlice({
         state.success = true;
         state.isLoading = false;
       })
-      .addCase(loginUser.pending, (state) => {
+      .addCase(loginUser.pending, (state, { payload }) => {
+        state.data = payload;
         state.success = false;
         state.isLoading = true;
       })
@@ -91,6 +92,7 @@ export const authSlice = createSlice({
         state.success = false;
         state.isLoading = false;
       })
+      .addDefaultCase((state) => state);
   }
 });
 

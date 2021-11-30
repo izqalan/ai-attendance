@@ -1,15 +1,18 @@
 import React from 'react';
 import { Button } from '@chakra-ui/react';
-import { useDispatch } from 'react-redux';
-import { logout } from '../auth/authSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { logout, selectAuthData } from '../auth/authSlice';
 
 const Dashboard = () => {
+  const authData = useSelector(selectAuthData);
   const dispatch = useDispatch();
   const handleLogout = () => {
     dispatch(logout());
   };
+  console.log(authData);
   return (
     <div>
+      {authData && <pre>{JSON.stringify(authData, null, 2)}</pre>}
       <Button 
         colorScheme="blue"
         size="lg" 

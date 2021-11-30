@@ -14,18 +14,17 @@ const LoginForm = (props) => {
   const success = useSelector(selectAuthSuccess);
   const authData = useSelector(selectAuthData);
   const toast = useToast();
-  console.log(authData);
   if (authData !== null) {
     return <Navigate to={{ pathname: '/dashboard' }} />;
   }
-
+  console.log(authData);
   const handleSubmit = (e) => {
     e.preventDefault();
     const email = e.target.email.value;
     const password = e.target.password.value;
     dispatch(loginUser({ email, password }));
   };
-  
+
   if (success && !isEmpty(authData)) {
     toast({
       title: 'Success',
@@ -38,21 +37,22 @@ const LoginForm = (props) => {
 
   return (
     <chakra.form
-    onSubmit={(e) => {
-      handleSubmit(e);
-    }}
-    {...props}
+      onSubmit={(e) => {
+        handleSubmit(e);
+      }}
+      {...props}
     >
-    <Stack spacing="6">
-      <FormControl id="email">
-        <FormLabel>Email address</FormLabel>
-        <Input name="email" type="email" autoComplete="email" required />
-      </FormControl>
-      <PasswordField />
-      <Button type="submit" colorScheme="blue" size="lg" fontSize="md">
-        Sign in
-      </Button>
-    </Stack>
+      {authData && <pre>{JSON.stringify(authData, null, 2)}</pre>}
+      <Stack spacing="6">
+        <FormControl id="email">
+          <FormLabel>Email address</FormLabel>
+          <Input name="email" type="email" autoComplete="email" required />
+        </FormControl>
+        <PasswordField />
+        <Button type="submit" colorScheme="blue" size="lg" fontSize="md">
+          Sign in
+        </Button>
+      </Stack>
     </chakra.form>
   );
 };

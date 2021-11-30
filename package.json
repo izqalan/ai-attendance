@@ -19,11 +19,12 @@
     "react-redux": "^7.2.3",
     "react-router": "^6.0.2",
     "react-router-dom": "^6.0.2",
-    "react-scripts": "4.0.3"
+    "react-scripts": "4.0.3",
+    "redux-persist": "^6.0.0"
   },
   "scripts": {
     "start": "ESLINT_NO_DEV_ERRORS=true react-scripts start",
-    "start-win": "set ESLINT_NO_DEV_ERRORS=true&& react-scripts start",
+    "start-win": "set ESLINT_NO_DEV_ERRORS=true&& set GENERATE_SOURCEMAP=true&& react-scripts start",
     "build": "ESLINT_NO_DEV_ERRORS=truereact-scripts build",
     "build-win": "set ESLINT_NO_DEV_ERRORS=true&& react-scripts build",
     "test": "ESLINT_NO_DEV_ERRORS=truereact-scripts test",
