@@ -6,7 +6,7 @@ import { useSelector } from 'react-redux';
 import PrivateRoute from './routes/PrivateRoute';
 import Login from './features/auth/Login';
 import SignUp from './features/auth/SignUp';
-import { supabase } from './supabase';
+// import { supabase } from './supabase';
 import Dashboard from './features/dashboard';
 import { selectAuthData } from './features/auth/authSlice';
 

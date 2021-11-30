@@ -9,7 +9,6 @@ const Dashboard = () => {
   const handleLogout = () => {
     dispatch(logout());
   };
-  console.log(authData);
   return (
     <div>
       {authData && <pre>{JSON.stringify(authData, null, 2)}</pre>}

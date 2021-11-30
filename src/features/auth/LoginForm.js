@@ -17,7 +17,6 @@ const LoginForm = (props) => {
   if (authData !== null) {
     return <Navigate to={{ pathname: '/dashboard' }} />;
   }
-  console.log(authData);
   const handleSubmit = (e) => {
     e.preventDefault();
     const email = e.target.email.value;
