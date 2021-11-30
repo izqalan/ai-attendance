@@ -12,12 +12,14 @@ import {
   PURGE,
   REGISTER,
 } from 'redux-persist';
-import { combineReducers } from 'redux'; 
+import { combineReducers } from 'redux';
 import storage from 'redux-persist/lib/storage';
 import authReducer from '../features/auth/authSlice';
+import userSlice from '../features/dashboard/userSlice';
 
 const reducers = combineReducers({
   auth: authReducer,
+  user: userSlice,
 });
 
 const persistConfig = {
@@ -30,10 +32,10 @@ const persistedReducer = persistReducer(persistConfig, reducers);
 const store = configureStore({
   reducer: persistedReducer,
   middleware: (getDefaultMiddleware) => getDefaultMiddleware({
-      serializableCheck: {
-        ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
-      },
-    }),
+    serializableCheck: {
+      ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+    },
+  }),
 });
 
 const persistor = persistStore(store);

@@ -22,18 +22,26 @@ import {
   Text,
   Wrap
 } from '@chakra-ui/react';
+import { useNavigate } from 'react-router-dom';
 import { HamburgerIcon, CloseIcon, AddIcon } from '@chakra-ui/icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout, selectAuthData } from '../auth/authSlice';
 import CreateModal from './CreateModal';
 
 const Dashboard = () => {
-  const authData = useSelector(selectAuthData);
+  // const authData = useSelector(selectAuthData);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const gotoChangePassword = () => {
+    navigate('/change-password');
+  };
+
   const handleLogout = () => {
     dispatch(logout());
   };
+
   return (
     <>
       <Box bg={useColorModeValue('gray.50', 'gray.900')} shadow="md" px={4}>
@@ -82,7 +90,7 @@ const Dashboard = () => {
                 />
               </MenuButton>
               <MenuList>
-                <MenuItem>Profile</MenuItem>
+                <MenuItem onClick={() => gotoChangePassword()}>Change Password</MenuItem>
                 <MenuDivider />
                 <MenuItem onClick={() => handleLogout()}>Logout</MenuItem>
               </MenuList>

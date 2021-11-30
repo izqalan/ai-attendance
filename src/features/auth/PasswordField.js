@@ -14,6 +14,7 @@ import * as React from 'react';
 import { HiEye, HiEyeOff } from 'react-icons/hi';
 
 export const PasswordField = React.forwardRef((props, ref) => {
+  const { label = label ?? true } = props;
   const { isOpen, onToggle } = useDisclosure();
   const inputRef = React.useRef(null);
   const mergeRef = useMergeRefs(inputRef, ref);
@@ -36,10 +37,7 @@ export const PasswordField = React.forwardRef((props, ref) => {
   return (
     <FormControl id="password">
       <Flex justify="space-between">
-        <FormLabel>Password</FormLabel>
-        <Box as="a" fontWeight="semibold" fontSize="sm">
-          Forgot Password?
-        </Box>
+        {label && <FormLabel>Password</FormLabel>}
       </Flex>
       <InputGroup>
         <InputRightElement>

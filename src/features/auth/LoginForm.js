@@ -46,7 +46,7 @@ const LoginForm = (props) => {
           <FormLabel>Email address</FormLabel>
           <Input name="email" type="email" autoComplete="email" required />
         </FormControl>
-        <PasswordField />
+        <PasswordField label />
         <Button type="submit" colorScheme="blue" size="lg" fontSize="md">
           Sign in
         </Button>
