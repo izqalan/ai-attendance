@@ -41,7 +41,6 @@ const LoginForm = (props) => {
       }}
       {...props}
     >
-      {authData && <pre>{JSON.stringify(authData, null, 2)}</pre>}
       <Stack spacing="6">
         <FormControl id="email">
           <FormLabel>Email address</FormLabel>
