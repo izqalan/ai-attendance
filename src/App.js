@@ -9,6 +9,7 @@ import SignUp from './features/auth/SignUp';
 // import { supabase } from './supabase';
 import Dashboard from './features/dashboard';
 import { selectAuthData } from './features/auth/authSlice';
+import './styles/main.css';
 
 const App = function app() {
   // const auth = supabase.auth.session();

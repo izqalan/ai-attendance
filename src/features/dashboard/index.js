@@ -19,11 +19,13 @@ import {
   Container,
   Heading,
   Center,
-  Text
+  Text,
+  Wrap
 } from '@chakra-ui/react';
 import { HamburgerIcon, CloseIcon, AddIcon } from '@chakra-ui/icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout, selectAuthData } from '../auth/authSlice';
+import CreateModal from './CreateModal';
 
 const Dashboard = () => {
   const authData = useSelector(selectAuthData);
@@ -34,7 +36,7 @@ const Dashboard = () => {
   };
   return (
     <>
-      <Box bg={useColorModeValue('gray.100', 'gray.900')} px={4}>
+      <Box bg={useColorModeValue('gray.50', 'gray.900')} shadow="md" px={4}>
         <Flex h={16} alignItems="center" justifyContent="space-between">
           <IconButton
             size="md"
@@ -60,10 +62,11 @@ const Dashboard = () => {
                 }}
                 href="#"
               >
-                Test
+                About
               </Link>
             </HStack>
           </HStack>
+
           <Flex alignItems="center">
             <Menu>
               <MenuButton
@@ -87,12 +90,10 @@ const Dashboard = () => {
           </Flex>
         </Flex>
       </Box>
-
-      {/* <Box p={4}>Main Content Here</Box> */}
-      <Container maxW='container.xl' mt={20}>
+      <Container maxW='container.xl' mt={12}>
         <Box>
           <Heading my={8}>Your events</Heading>
-          <Flex>
+          <Flex pb={4} overflowX="auto">
             <Box
               border="2px"
               borderRadius="md"
@@ -102,6 +103,7 @@ const Dashboard = () => {
               cursor="pointer"
               py={12}
               mx={2}
+              onClick={onOpen}
             >
               <Center>
                 <VStack>
@@ -110,6 +112,7 @@ const Dashboard = () => {
                 </VStack>
               </Center>
             </Box>
+            <CreateModal isOpen={isOpen} onClose={onClose} />
 
             <Box
               border="2px"
@@ -132,7 +135,7 @@ const Dashboard = () => {
 
         <Box>
           <Heading my={8}>Other events</Heading>
-          <Flex>
+          <Wrap>
             <Box
               border="2px"
               borderRadius="md"
@@ -149,7 +152,7 @@ const Dashboard = () => {
                 <Text color="gray.400">By user24601</Text>
               </Box>
             </Box>
-          </Flex>
+          </Wrap>
         </Box>
       </Container>
     </>
