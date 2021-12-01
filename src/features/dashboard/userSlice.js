@@ -3,6 +3,7 @@ import { supabase } from '../../supabase';
 
 const initialState = {
   auth: null,
+  user: null,
   success: false,
   isLoading: false,
 };
@@ -32,6 +33,18 @@ export const sendResetPasswordEmail = createAsyncThunk(
   }
 );
 
+export const fetchUser = createAsyncThunk(
+  'USER/FETCH',
+  async () => {
+    try {
+      const response = await supabase.auth.user();
+      return response;
+    } catch (error) {
+      console.error('Error', error);
+    }
+  }
+);
+
 export const userSlice = createSlice({
   name: 'USER',
   initialState,
@@ -44,6 +57,25 @@ export const userSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      .addCase(fetchUser.fulfilled, (state, { payload }) => {
+        const { error } = payload;
+        if (error) {
+          state.success = false;
+          state.isLoading = false;
+        } else {
+          state.user = payload;
+          state.success = true;
+          state.isLoading = false;
+        }
+      })
+      .addCase(fetchUser.pending, (state) => {
+        state.success = false;
+        state.isLoading = true;
+      })
+      .addCase(fetchUser.rejected, (state) => {
+        state.success = false;
+        state.isLoading = true;
+      })
       .addCase(updateUserAuth.fulfilled, (state, { payload }) => {
         const { error, data } = payload;
         if (error) {
@@ -85,6 +117,7 @@ export const userSlice = createSlice({
 });
 
 export const selectUser = (state) => state.user.auth;
+export const selectUserData = (state) => state.user.user;
 export const selectUserSuccess = (state) => state.user.success;
 export const selectUserIsLoading = (state) => state.user.isLoading;
 

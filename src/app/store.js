@@ -12,15 +12,8 @@ import {
   PURGE,
   REGISTER,
 } from 'redux-persist';
-import { combineReducers } from 'redux';
 import storage from 'redux-persist/lib/storage';
-import authReducer from '../features/auth/authSlice';
-import userSlice from '../features/dashboard/userSlice';
-
-const reducers = combineReducers({
-  auth: authReducer,
-  user: userSlice,
-});
+import { reducers } from '../redux/reducers';
 
 const persistConfig = {
   key: 'root',

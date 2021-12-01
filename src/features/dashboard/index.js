@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   Box,
   Flex,
@@ -26,10 +26,11 @@ import { useNavigate } from 'react-router-dom';
 import { HamburgerIcon, CloseIcon, AddIcon } from '@chakra-ui/icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout, selectAuthData } from '../auth/authSlice';
+import { fetchUser } from './userSlice';
 import CreateModal from './CreateModal';
 
 const Dashboard = () => {
-  // const authData = useSelector(selectAuthData);
+  const authData = useSelector(selectAuthData);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -41,6 +42,10 @@ const Dashboard = () => {
   const handleLogout = () => {
     dispatch(logout());
   };
+
+  useEffect(() => {
+    dispatch(fetchUser());
+  }, [authData]);
 
   return (
     <>
@@ -120,7 +125,10 @@ const Dashboard = () => {
                 </VStack>
               </Center>
             </Box>
-            <CreateModal isOpen={isOpen} onClose={onClose} />
+            <CreateModal
+              isOpen={isOpen}
+              onClose={onClose}
+            />
 
             <Box
               border="2px"
