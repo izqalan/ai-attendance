@@ -47,6 +47,13 @@ const Dashboard = () => {
     dispatch(logout());
   };
 
+  const gotoAttendanceScreen = (eventId) => {
+    navigate({
+      pathname: '/dashboard/attendance',
+      search: `?event_id=${eventId}`,
+    });
+  };
+
   useEffect(() => {
     dispatch(fetchUser());
     dispatch(fetchEvents());
@@ -146,6 +153,7 @@ const Dashboard = () => {
                 cursor="pointer"
                 py={12}
                 mx={2}
+                onClick={() => gotoAttendanceScreen(event.id)}
               >
                 <Box mx={4} end>
                   <Text fontSize="2xl">{event.title}</Text>
@@ -172,6 +180,7 @@ const Dashboard = () => {
                 cursor="pointer"
                 py={12}
                 mx={2}
+                onClick={() => gotoAttendanceScreen(event.id)}
               >
                 <Box mx={4} end>
                   <Text fontSize="2xl">{event.title}</Text>

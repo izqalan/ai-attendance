@@ -1,15 +1,13 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   Flex,
   Box,
-  Heading,
   Button,
   Center,
   Text,
   Table,
   Thead,
   Tbody,
-  Tfoot,
   Tr,
   Th,
   Td,
@@ -20,14 +18,25 @@ import {
 import Webcam from 'react-webcam';
 import { useNavigate } from 'react-router';
 import { ArrowBackIcon } from '@chakra-ui/icons';
+import { useSelector, useDispatch } from 'react-redux';
+import { useLocation } from 'react-router-dom';
+import { selectSingleEvent, fetchEventById } from '../eventSlice';
 
-const EventAttendance = (state) => {
+const EventAttendance = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { search } = useLocation();
+  const eventId = new URLSearchParams(search).get('event_id');
+  const event = useSelector(selectSingleEvent);
+
   const videoConstraints = {
     // width: 1280,
     // height: 720,
     facingMode: 'user'
   };
+  useEffect(() => {
+    dispatch(fetchEventById({ eventId }));
+  }, []);
 
   return (
     <Container maxWidth="container.xl" h="100vh">
@@ -47,8 +56,8 @@ const EventAttendance = (state) => {
         <Center h="90vh">
           <VStack alignContent="start">
             <Box w="full" py={4}>
-              <Text fontWeight={100} fontSize="3xl">Event title</Text>
-              <Text noOfLines={2}>Description</Text>
+              <Text fontWeight={100} fontSize="3xl" fontStyle="">{event.title}</Text>
+              <Text noOfLines={2}>{event.description}</Text>
             </Box>
             <Flex align="start">
               <Box w="3/4">
