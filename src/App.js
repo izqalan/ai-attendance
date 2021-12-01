@@ -8,6 +8,7 @@ import Login from './features/auth/Login';
 import SignUp from './features/auth/SignUp';
 // import { supabase } from './supabase';
 import Dashboard from './features/dashboard';
+import EventAttendance from './features/dashboard/EventAttendance/index'
 import ResetPassword from './features/dashboard/ResetPassword';
 import { selectAuthData } from './features/auth/authSlice';
 import './styles/main.css';
@@ -31,6 +32,10 @@ const App = function app() {
             element={<SignUp />}
           />
           <Route
+            path="/change-password"
+            element={<ResetPassword />}
+          />
+          <Route
             exact
             path="/"
             element={(
@@ -41,14 +46,20 @@ const App = function app() {
             )}
           />
           <Route
-            path="/change-password"
-            element={<ResetPassword />}
-          />
-          <Route
             path="/dashboard"
             element={(
               <PrivateRoute
                 component={Dashboard}
+                auth={auth}
+              />
+            )}
+          />
+          <Route
+            exact
+            path="/dashboard/attendance"
+            element={(
+              <PrivateRoute
+                component={EventAttendance}
                 auth={auth}
               />
             )}
