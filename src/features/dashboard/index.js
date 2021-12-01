@@ -25,16 +25,20 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { HamburgerIcon, CloseIcon, AddIcon } from '@chakra-ui/icons';
 import { useDispatch, useSelector } from 'react-redux';
+import { isEmpty, filter } from 'lodash';
 import { logout, selectAuthData } from '../auth/authSlice';
-import { fetchUser } from './userSlice';
+import { fetchUser, selectUserData } from './userSlice';
+import { fetchEvents, selectEvents } from './eventSlice';
 import CreateModal from './CreateModal';
 
 const Dashboard = () => {
   const authData = useSelector(selectAuthData);
+  const user = useSelector(selectUserData);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
+  const events = useSelector(selectEvents);
+  const userCreatedEvents = filter(useSelector(selectEvents), event => event.user.email === user.email);
   const gotoChangePassword = () => {
     navigate('/change-password');
   };
@@ -45,6 +49,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     dispatch(fetchUser());
+    dispatch(fetchEvents());
   }, [authData]);
 
   return (
@@ -129,45 +134,51 @@ const Dashboard = () => {
               isOpen={isOpen}
               onClose={onClose}
             />
-
-            <Box
-              border="2px"
-              borderRadius="md"
-              borderColor="gray.200"
-              borderStyle="solid"
-              shadow="md"
-              minW="sm"
-              cursor="pointer"
-              py={12}
-              mx={2}
-            >
-              <Box mx={4} end>
-                <Text fontSize="2xl">Les Misérables</Text>
-                <Text color="gray.400">By user24601</Text>
+            {!isEmpty(events) && userCreatedEvents.map((event) => (
+              <Box
+                key={event.id}
+                border="2px"
+                borderRadius="md"
+                borderColor="gray.200"
+                borderStyle="solid"
+                shadow="md"
+                minW="sm"
+                cursor="pointer"
+                py={12}
+                mx={2}
+              >
+                <Box mx={4} end>
+                  <Text fontSize="2xl">{event.title}</Text>
+                  <Text color="gray.400">By {event.user.email}</Text>
+                </Box>
               </Box>
-            </Box>
+            ))}
+
           </Flex>
         </Box>
 
         <Box>
           <Heading my={8}>Other events</Heading>
           <Wrap>
-            <Box
-              border="2px"
-              borderRadius="md"
-              borderColor="gray.200"
-              borderStyle="solid"
-              shadow="md"
-              minW="sm"
-              cursor="pointer"
-              py={12}
-              mx={2}
-            >
-              <Box mx={4} end>
-                <Text fontSize="2xl">Les Misérables</Text>
-                <Text color="gray.400">By user24601</Text>
+            {!isEmpty(events) && events.map((event) => (
+              <Box
+                key={event.id}
+                border="2px"
+                borderRadius="md"
+                borderColor="gray.200"
+                borderStyle="solid"
+                shadow="md"
+                minW="sm"
+                cursor="pointer"
+                py={12}
+                mx={2}
+              >
+                <Box mx={4} end>
+                  <Text fontSize="2xl">{event.title}</Text>
+                  <Text color="gray.400">By {event.user.email}</Text>
+                </Box>
               </Box>
-            </Box>
+            ))}
           </Wrap>
         </Box>
       </Container>

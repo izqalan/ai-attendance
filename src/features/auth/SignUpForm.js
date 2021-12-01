@@ -1,7 +1,7 @@
 /* eslint-disable import/named */
 /* eslint-disable react/react-in-jsx-scope */
 import { Button, chakra, FormControl, FormLabel, Input, Stack, useToast } from '@chakra-ui/react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Navigate } from 'react-router-dom';
 import { PasswordField } from './PasswordField';
 import { signUp, selectAuthSuccess } from './authSlice';

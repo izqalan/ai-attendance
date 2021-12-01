@@ -22,6 +22,23 @@ export const createEvent = createAsyncThunk(
   }
 );
 
+export const fetchEvents = createAsyncThunk(
+  'EVENT/FETCHALL',
+  async () => {
+    try {
+      const response = await supabase
+        .from('events')
+        .select(`
+          *,
+          user:userId(*)
+        `);
+      return response;
+    } catch (error) {
+      return error;
+    }
+  }
+);
+
 export const eventSlice = createSlice({
   name: 'EVENT',
   initialState,
@@ -34,6 +51,25 @@ export const eventSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      .addCase(fetchEvents.fulfilled, (state, { payload }) => {
+        const { error, data } = payload;
+        if (error) {
+          state.success = false;
+          state.isLoading = false;
+        } else {
+          state.events = data;
+          state.success = true;
+          state.isLoading = false;
+        }
+      })
+      .addCase(fetchEvents.pending, (state) => {
+        state.success = false;
+        state.isLoading = true;
+      })
+      .addCase(fetchEvents.rejected, (state) => {
+        state.success = false;
+        state.isLoading = true;
+      })
       .addCase(createEvent.fulfilled, (state, { payload }) => {
         const { error } = payload;
         if (error) {
