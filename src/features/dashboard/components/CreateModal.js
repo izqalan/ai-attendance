@@ -16,8 +16,8 @@ import {
 } from '@chakra-ui/react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useToast } from '@chakra-ui/toast';
-import { createEvent } from './eventSlice';
-import { selectUserData } from './userSlice';
+import { createEvent } from '../eventSlice';
+import { selectUserData } from '../userSlice';
 
 const CreateModal = (props) => {
   const { isOpen, onClose } = props;

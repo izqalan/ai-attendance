@@ -29,7 +29,7 @@ import { isEmpty, filter } from 'lodash';
 import { logout, selectAuthData } from '../auth/authSlice';
 import { fetchUser, selectUserData } from './userSlice';
 import { fetchEvents, selectEvents } from './eventSlice';
-import CreateModal from './CreateModal';
+import CreateModal from './components/CreateModal';
 
 const Dashboard = () => {
   const authData = useSelector(selectAuthData);
