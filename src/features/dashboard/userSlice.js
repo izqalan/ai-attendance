@@ -14,7 +14,7 @@ export const updateUserAuth = createAsyncThunk(
       const response = await supabase.auth.api.updateUser(accessToken, payload);
       return response;
     } catch (error) {
-      console.error('Error', e.response.data);
+      console.error('Error', error);
     }
   }
 );
@@ -27,7 +27,7 @@ export const sendResetPasswordEmail = createAsyncThunk(
         .resetPasswordForEmail(email);
       return response;
     } catch (error) {
-      console.error('Error', e.response.data);
+      console.error('Error', error);
     }
   }
 );
