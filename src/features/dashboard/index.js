@@ -20,10 +20,11 @@ import {
   Heading,
   Center,
   Text,
-  Wrap
+  Wrap,
+  Spacer 
 } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
-import { HamburgerIcon, CloseIcon, AddIcon } from '@chakra-ui/icons';
+import { HamburgerIcon, CloseIcon, AddIcon, ArrowUpIcon } from '@chakra-ui/icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { isEmpty, filter } from 'lodash';
 import { logout, selectAuthData } from '../auth/authSlice';
@@ -127,7 +128,7 @@ const Dashboard = () => {
               minW="sm"
               cursor="pointer"
               py={12}
-              mx={2}
+              mx={1}
               onClick={onOpen}
             >
               <Center>
@@ -152,10 +153,10 @@ const Dashboard = () => {
                 minW="sm"
                 cursor="pointer"
                 py={12}
-                mx={2}
+                mx={1}
                 onClick={() => gotoAttendanceScreen(event.id)}
               >
-                <Box mx={4} end>
+                <Box mx={4}>
                   <Text fontSize="2xl">{event.title}</Text>
                   <Text color="gray.400">By {event.user.email}</Text>
                 </Box>
@@ -166,7 +167,7 @@ const Dashboard = () => {
         </Box>
 
         <Box>
-          <Heading my={8}>Other events</Heading>
+          <Heading my={4}>Other events</Heading>
           <Wrap>
             {!isEmpty(events) && events.map((event) => (
               <Box
@@ -179,10 +180,10 @@ const Dashboard = () => {
                 minW="sm"
                 cursor="pointer"
                 py={12}
-                mx={2}
+                mx={8}
                 onClick={() => gotoAttendanceScreen(event.id)}
               >
-                <Box mx={4} end>
+                <Box mx={4}>
                   <Text fontSize="2xl">{event.title}</Text>
                   <Text color="gray.400">By {event.user.email}</Text>
                 </Box>
@@ -190,7 +191,24 @@ const Dashboard = () => {
             ))}
           </Wrap>
         </Box>
+        <Flex p={8}>
+          <Spacer />
+          <Box>
+            <IconButton
+              icon={<ArrowUpIcon />}
+              color="black"
+              bgColor="transparent"
+              type="button"
+              border
+              borderWidth="2px"
+              borderColor="black"
+              borderRadius={100}
+              onClick={() => window.scrollTo(0, 0)}
+            />
+          </Box>
+        </Flex>
       </Container>
+
     </>
   );
 };
