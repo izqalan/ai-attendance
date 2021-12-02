@@ -1,14 +1,14 @@
 /* eslint-disable import/no-named-as-default */
 /* eslint-disable import/no-named-as-default-member */
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, BrowserRouter } from 'react-router-dom';
+import { Routes, Route, BrowserRouter } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import PrivateRoute from './routes/PrivateRoute';
 import Login from './features/auth/Login';
 import SignUp from './features/auth/SignUp';
 // import { supabase } from './supabase';
 import Dashboard from './features/dashboard';
-import EventAttendance from './features/dashboard/EventAttendance/index'
+import EventAttendance from './features/dashboard/EventAttendance/index';
 import ResetPassword from './features/dashboard/ResetPassword';
 import { selectAuthData } from './features/auth/authSlice';
 import './styles/main.css';

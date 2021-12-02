@@ -1,5 +1,5 @@
 import { Container } from '@chakra-ui/layout';
-import { Box, Heading, Text } from '@chakra-ui/react';
+import { Box, Heading } from '@chakra-ui/react';
 import React from 'react';
 import SignUpForm from './SignUpForm';
 

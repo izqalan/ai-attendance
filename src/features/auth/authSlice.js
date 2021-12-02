@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { supabase } from '../../supabase';
 
@@ -65,7 +66,7 @@ export const authSlice = createSlice({
           state.isLoading = false;
         }
       })
-      .addCase(loginUser.pending, (state, { payload }) => {
+      .addCase(loginUser.pending, (state) => {
         state.success = false;
         state.isLoading = true;
       })
