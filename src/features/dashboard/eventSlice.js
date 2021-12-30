@@ -208,7 +208,6 @@ export const eventSlice = createSlice({
       })
       .addCase(fetchAttendees.fulfilled, (state, { payload }) => {
         const { error, data } = payload;
-        console.log(data);
         state.attendees = data;
       })
       .addCase(fetchAttendees.pending, (state) => {

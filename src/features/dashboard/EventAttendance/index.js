@@ -105,9 +105,9 @@ const EventAttendance = () => {
                   <Tbody>
                     {attendees.map((attendee) => (
                       <Tr key={attendee.userId}>
-                        <Td>{attendee.user.firstname} {attendee.user.lastname}</Td>
-                        <Td>{attendee.userId}</Td>
-                        <Td>{attendee.user.email}</Td>
+                        <Td><Text isTruncated>{attendee.user.firstname} {attendee.user.lastname}</Text></Td>
+                        <Td><Text isTruncated>{attendee.userId}</Text></Td>
+                        <Td><Text isTruncated>{attendee.user.email}</Text></Td>
                       </Tr>
                     ))}
                   </Tbody>
