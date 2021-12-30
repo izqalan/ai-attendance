@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Flex,
   Box,
@@ -20,7 +20,7 @@ import { useNavigate } from 'react-router';
 import { ArrowBackIcon } from '@chakra-ui/icons';
 import { useSelector, useDispatch } from 'react-redux';
 import { useLocation } from 'react-router-dom';
-import { selectSingleEvent, fetchEventById } from '../eventSlice';
+import { selectSingleEvent, fetchEventById, captureFace } from '../eventSlice';
 
 const EventAttendance = () => {
   const navigate = useNavigate();
@@ -28,6 +28,8 @@ const EventAttendance = () => {
   const { search } = useLocation();
   const eventId = new URLSearchParams(search).get('event_id');
   const event = useSelector(selectSingleEvent);
+  const [imageSrc, setImageSrc] = useState(null);
+  const webcamRef = React.useRef(null);
 
   const videoConstraints = {
     // width: 1280,
@@ -37,6 +39,12 @@ const EventAttendance = () => {
   useEffect(() => {
     dispatch(fetchEventById({ eventId }));
   }, []);
+
+  const capture = React.useCallback(() => {
+    const img = webcamRef.current.getScreenshot();
+    setImageSrc(img);
+    dispatch(captureFace({ eventId, imageSrc: img }));
+  }, [webcamRef, setImageSrc]);
 
   return (
     <Container maxWidth="container.xl" h="100vh">
@@ -66,7 +74,12 @@ const EventAttendance = () => {
                   // width={1280}
                   // height={720}
                   videoConstraints={videoConstraints}
+                  ref={webcamRef}
+                  screenshotFormat="image/jpeg"
                 />
+                <Button onClick={() => { capture(); }} variant='outline' colorScheme="teal" mt={4}>
+                  Take Attendance
+                </Button>
               </Box>
               <Box
                 w="1/4"
