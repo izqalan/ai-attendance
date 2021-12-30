@@ -128,7 +128,11 @@ export const eventSlice = createSlice({
       state.events = null;
       state.success = false;
       state.isLoading = false;
+      state.attendees = null;
     },
+    appendAttendees: (state, action) => {
+      state.attendees = state.attendees.concat(action.payload);
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -220,6 +224,8 @@ export const eventSlice = createSlice({
       });
   }
 });
+
+export const { appendAttendees, clearState } = eventSlice.actions;
 
 export const selectEvents = (state) => state.event.events;
 export const selectUserSuccess = (state) => state.event.success;

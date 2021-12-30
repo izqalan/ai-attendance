@@ -20,7 +20,9 @@ import { useNavigate } from 'react-router';
 import { ArrowBackIcon } from '@chakra-ui/icons';
 import { useSelector, useDispatch } from 'react-redux';
 import { useLocation } from 'react-router-dom';
-import { selectSingleEvent, selectAttendees, fetchEventById, captureFace, fetchAttendees } from '../eventSlice';
+import { isEmpty } from 'lodash';
+import { supabase } from '../../../supabase';
+import { clearState, selectSingleEvent, selectAttendees, appendAttendees, fetchEventById, captureFace, fetchAttendees } from '../eventSlice';
 
 const EventAttendance = () => {
   const navigate = useNavigate();
@@ -37,9 +39,27 @@ const EventAttendance = () => {
     // height: 720,
     facingMode: 'user'
   };
+
+  const mySubscription = async () => {
+    supabase
+      .from('UsersEvents')
+      .on('INSERT', async (data) => {
+        const response = await supabase
+          .from('UsersEvents')
+          .select(`
+          *,
+          user:userId(*)
+        `).eq('id', data.new.id);
+        dispatch(appendAttendees(response.data[0]));
+      })
+      .subscribe();
+  };
+
   useEffect(() => {
+    dispatch(clearState());
     dispatch(fetchEventById({ eventId }));
     dispatch(fetchAttendees({ eventId }));
+    mySubscription();
   }, []);
 
   const capture = React.useCallback(() => {
@@ -103,8 +123,8 @@ const EventAttendance = () => {
                     </Tr>
                   </Thead>
                   <Tbody>
-                    {attendees.map((attendee) => (
-                      <Tr key={attendee.userId}>
+                    {!isEmpty(attendees) && attendees.map((attendee) => (
+                      <Tr key={attendee.id}>
                         <Td><Text isTruncated>{attendee.user.firstname} {attendee.user.lastname}</Text></Td>
                         <Td><Text isTruncated>{attendee.userId}</Text></Td>
                         <Td><Text isTruncated>{attendee.user.email}</Text></Td>

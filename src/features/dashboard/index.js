@@ -29,7 +29,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { isEmpty, filter } from 'lodash';
 import { logout, selectAuthData } from '../auth/authSlice';
 import { fetchUser, selectUserData } from './userSlice';
-import { fetchEvents, selectEvents } from './eventSlice';
+import { fetchEvents, selectEvents, clearState } from './eventSlice';
 import CreateModal from './components/CreateModal';
 
 const Dashboard = () => {
@@ -56,6 +56,7 @@ const Dashboard = () => {
   };
 
   useEffect(() => {
+    dispatch(clearState());
     dispatch(fetchUser());
     dispatch(fetchEvents());
   }, [authData]);
