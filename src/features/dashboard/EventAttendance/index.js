@@ -20,7 +20,7 @@ import { useNavigate } from 'react-router';
 import { ArrowBackIcon } from '@chakra-ui/icons';
 import { useSelector, useDispatch } from 'react-redux';
 import { useLocation } from 'react-router-dom';
-import { selectSingleEvent, fetchEventById, captureFace } from '../eventSlice';
+import { selectSingleEvent, selectAttendees, fetchEventById, captureFace, fetchAttendees } from '../eventSlice';
 
 const EventAttendance = () => {
   const navigate = useNavigate();
@@ -28,6 +28,7 @@ const EventAttendance = () => {
   const { search } = useLocation();
   const eventId = new URLSearchParams(search).get('event_id');
   const event = useSelector(selectSingleEvent);
+  const attendees = useSelector(selectAttendees);
   const [imageSrc, setImageSrc] = useState(null);
   const webcamRef = React.useRef(null);
 
@@ -38,6 +39,7 @@ const EventAttendance = () => {
   };
   useEffect(() => {
     dispatch(fetchEventById({ eventId }));
+    dispatch(fetchAttendees({ eventId }));
   }, []);
 
   const capture = React.useCallback(() => {
@@ -78,7 +80,7 @@ const EventAttendance = () => {
                   screenshotFormat="image/jpeg"
                 />
                 <Button onClick={() => { capture(); }} variant='outline' colorScheme="teal" mt={4}>
-                  Take Attendance
+                  I&apos;m here 🎉!
                 </Button>
               </Box>
               <Box
@@ -101,11 +103,13 @@ const EventAttendance = () => {
                     </Tr>
                   </Thead>
                   <Tbody>
-                    <Tr>
-                      <Td>Epic</Td>
-                      <Td>4574456341563</Td>
-                      <Td>test@mail.com</Td>
-                    </Tr>
+                    {attendees.map((attendee) => (
+                      <Tr key={attendee.userId}>
+                        <Td>{attendee.user.firstname} {attendee.user.lastname}</Td>
+                        <Td>{attendee.userId}</Td>
+                        <Td>{attendee.user.email}</Td>
+                      </Tr>
+                    ))}
                   </Tbody>
                 </Table>
               </Box>

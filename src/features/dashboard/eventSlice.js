@@ -15,6 +15,7 @@ const initialState = {
   event: {},
   success: false,
   isLoading: false,
+  attendees: null,
 };
 
 export const createEvent = createAsyncThunk(
@@ -41,6 +42,23 @@ export const fetchEvents = createAsyncThunk(
           *,
           user:userId(*)
         `);
+      return response;
+    } catch (error) {
+      return error;
+    }
+  }
+);
+
+export const fetchAttendees = createAsyncThunk(
+  'EVENT/ATTENDEES',
+  async ({ eventId }) => {
+    try {
+      const response = await supabase
+        .from('UsersEvents')
+        .select(`
+          *,
+          user:userId(*)
+        `).eq('eventId', eventId);
       return response;
     } catch (error) {
       return error;
@@ -80,14 +98,21 @@ export const captureFace = createAsyncThunk(
           Bytes: buffer
         },
         MaxFaces: 1,
-      }, (err, data) => {
+      }, async (err, data) => {
         if (err) {
           response = {
             error: err,
           };
-        } 
+        }
         response = data;
+
+        const detectedUserId = response.FaceMatches[0].Face.ExternalImageId;
+
+        await supabase
+          .from('UsersEvents')
+          .insert([{ eventId, userId: detectedUserId, isAttended: true }]);
       });
+
       return response;
     } catch (error) {
       return error;
@@ -180,6 +205,19 @@ export const eventSlice = createSlice({
       .addCase(captureFace.rejected, (state) => {
         state.success = false;
         state.isLoading = true;
+      })
+      .addCase(fetchAttendees.fulfilled, (state, { payload }) => {
+        const { error, data } = payload;
+        console.log(data);
+        state.attendees = data;
+      })
+      .addCase(fetchAttendees.pending, (state) => {
+        state.success = false;
+        state.isLoading = true;
+      })
+      .addCase(fetchAttendees.rejected, (state) => {
+        state.success = false;
+        state.isLoading = true;
       });
   }
 });
@@ -188,5 +226,6 @@ export const selectEvents = (state) => state.event.events;
 export const selectUserSuccess = (state) => state.event.success;
 export const selectUserIsLoading = (state) => state.event.isLoading;
 export const selectSingleEvent = (state) => state.event.event;
+export const selectAttendees = (state) => state.event.attendees;
 
 export default eventSlice.reducer;
