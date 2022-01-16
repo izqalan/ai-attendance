@@ -111,8 +111,10 @@ export const captureFace = createAsyncThunk(
           .from('UsersEvents')
           .insert([{ eventId, userId: detectedUserId, isAttended: true }]);
       });
+      console.log(response);
       return response;
     } catch (error) {
+      console.log(error);
       return error;
     }
   }
