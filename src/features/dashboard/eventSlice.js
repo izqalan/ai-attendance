@@ -93,11 +93,11 @@ export const captureFace = createAsyncThunk(
       let response = {};
       rekognition.searchFacesByImage({
         CollectionId: 'uniten-faces',
+        MaxFaces: 1,
         FaceMatchThreshold: 70,
         Image: {
           Bytes: buffer
         },
-        MaxFaces: 1,
       }, async (err, data) => {
         if (err) {
           response = {
@@ -107,12 +107,10 @@ export const captureFace = createAsyncThunk(
         response = data;
 
         const detectedUserId = response.FaceMatches[0].Face.ExternalImageId;
-
         await supabase
           .from('UsersEvents')
           .insert([{ eventId, userId: detectedUserId, isAttended: true }]);
       });
-
       return response;
     } catch (error) {
       return error;
