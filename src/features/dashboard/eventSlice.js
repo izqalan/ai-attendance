@@ -191,7 +191,7 @@ export const eventSlice = createSlice({
         state.isLoading = true;
       })
       .addCase(captureFace.fulfilled, (state, { payload }) => {
-        const { error, data } = payload;
+        const { error } = payload;
         if (error) {
           state.success = false;
           state.isLoading = false;
@@ -209,7 +209,7 @@ export const eventSlice = createSlice({
         state.isLoading = true;
       })
       .addCase(fetchAttendees.fulfilled, (state, { payload }) => {
-        const { error, data } = payload;
+        const { data } = payload;
         state.attendees = data;
       })
       .addCase(fetchAttendees.pending, (state) => {

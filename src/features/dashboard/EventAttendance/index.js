@@ -65,7 +65,7 @@ const EventAttendance = () => {
   const capture = React.useCallback(() => {
     const img = webcamRef.current.getScreenshot();
     setImageSrc(img);
-    dispatch(captureFace({ eventId, imageSrc: img }));
+    dispatch(captureFace({ eventId, imageSrc }));
   }, [webcamRef, setImageSrc]);
 
   return (
