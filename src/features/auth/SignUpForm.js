@@ -13,22 +13,21 @@ const SignUp = (props) => {
   const success = useSelector(selectAuthSuccess);
   const toast = useToast();
 
-  if (success === true) {
-    toast({
-      title: 'Success',
-      description: 'Account created',
-      status: 'success',
-      duration: 3000,
-      isClosable: true,
-    });
-    return <Navigate to={{ pathname: '/login' }} />;
-  }
-
   const handleSubmit = (e) => {
     e.preventDefault();
     const email = e.target.email.value;
     const password = e.target.password.value;
     dispatch(signUp({ email, password }));
+    if (success === true) {
+      toast({
+        title: 'Success',
+        description: 'Account created',
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+      });
+      return <Navigate to={{ pathname: '/login' }} />;
+    }
   };
   
   return (
