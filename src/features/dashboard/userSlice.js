@@ -39,6 +39,7 @@ export const fetchUser = createAsyncThunk(
   async () => {
     try {
       const response = await supabase.auth.user();
+      console.log(response);
       return response;
     } catch (error) {
       console.error('Error', error);

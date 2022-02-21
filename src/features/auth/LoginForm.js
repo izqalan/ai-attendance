@@ -5,7 +5,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { isEmpty } from 'lodash';
 import { Navigate } from 'react-router-dom';
 import { PasswordField } from './PasswordField';
-import { loginUser, selectAuthSuccess, selectAuthData } from './authSlice';
+import { loginUser, loginUserUsingProvider, selectAuthSuccess, selectAuthData } from './authSlice';
+import { supabase } from '../../supabase';
 
 const LoginForm = (props) => {
   // const emailRef = useRef();
@@ -22,6 +23,13 @@ const LoginForm = (props) => {
     const email = e.target.email.value;
     const password = e.target.password.value;
     dispatch(loginUser({ email, password }));
+  };
+
+  const providerSignIn = async (provider) => {
+    const response = await supabase.auth.signIn({
+      provider,
+    });
+    dispatch(loginUserUsingProvider(response));
   };
 
   if (success && !isEmpty(authData)) {
@@ -49,6 +57,9 @@ const LoginForm = (props) => {
         <PasswordField label />
         <Button type="submit" colorScheme="blue" size="lg" fontSize="md">
           Sign in
+        </Button>
+        <Button type="button" onClick={() => providerSignIn('google')} colorScheme="blue" size="lg" fontSize="md">
+          Sign in with google
         </Button>
       </Stack>
     </chakra.form>
