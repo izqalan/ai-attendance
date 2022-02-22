@@ -13,7 +13,8 @@ import {
   Td,
   TableCaption,
   VStack,
-  Container
+  Container,
+  useToast,
 } from '@chakra-ui/react';
 import Webcam from 'react-webcam';
 import { useNavigate } from 'react-router';
@@ -27,6 +28,7 @@ import { clearState, selectSingleEvent, selectAttendees, appendAttendees, fetchE
 const EventAttendance = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const toast = useToast();
   const { search } = useLocation();
   const eventId = new URLSearchParams(search).get('event_id');
   const event = useSelector(selectSingleEvent);
@@ -65,7 +67,15 @@ const EventAttendance = () => {
   const capture = React.useCallback(() => {
     const img = webcamRef.current.getScreenshot();
     setImageSrc(img);
-    dispatch(captureFace({ eventId, imageSrc: img }));
+    dispatch(captureFace({ eventId, imageSrc: img })).then(() => {
+      toast({
+        title: 'Success',
+        description: 'Picture taken',
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+      });
+    });
   }, [webcamRef, setImageSrc]);
 
   return (

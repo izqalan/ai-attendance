@@ -15,7 +15,18 @@ export const loginUser = createAsyncThunk(
       const response = await supabase.auth.signIn({ email, password });
       return response;
     } catch (error) {
-      console.error('Error', e.response.data);
+      console.error('Error', error.response.data);
+    }
+  }
+);
+
+export const loginUserUsingProvider = createAsyncThunk(
+  'AUTH/LOGIN_PROVIDER',
+  async (response) => {
+    try {
+      return response;
+    } catch (error) {
+      console.error('Error', error.response.data);
     }
   }
 );
@@ -26,7 +37,7 @@ export const signUp = createAsyncThunk(
     try {
       await supabase.auth.signUp({ email, password });
     } catch (error) {
-      console.error('Error', e.response.data);
+      console.error('Error', error.response.data);
     }
   }
 );
@@ -37,7 +48,7 @@ export const logout = createAsyncThunk(
     try {
       await supabase.auth.signOut();
     } catch (error) {
-      console.error('Error', e.response.data);
+      console.error('Error', error.response.data);
     }
   }
 );
@@ -71,6 +82,27 @@ export const authSlice = createSlice({
         state.isLoading = true;
       })
       .addCase(loginUser.rejected, (state) => {
+        state.success = false;
+        state.isLoading = false;
+      })
+      .addCase(loginUserUsingProvider.fulfilled, (state, { payload }) => {
+        console.log('payload', payload);
+        const { error } = payload;
+        if (error) {
+          state.data = null;
+          state.success = false;
+          state.isLoading = false;
+        } else {
+          state.data = payload;
+          state.success = true;
+          state.isLoading = false;
+        }
+      })
+      .addCase(loginUserUsingProvider.pending, (state) => {
+        state.success = false;
+        state.isLoading = true;
+      })
+      .addCase(loginUserUsingProvider.rejected, (state) => {
         state.success = false;
         state.isLoading = false;
       })
