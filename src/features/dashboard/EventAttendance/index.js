@@ -1,19 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import {
-  Flex,
   Box,
   Button,
-  Center,
-  Text,
-  Table,
-  Thead,
-  Tbody,
-  Tr,
-  Th,
-  Td,
-  TableCaption,
-  VStack,
-  Container,
+  Grid, GridItem,
+  Stack,
   useToast,
 } from '@chakra-ui/react';
 import Webcam from 'react-webcam';
@@ -21,9 +11,11 @@ import { useNavigate } from 'react-router';
 import { ArrowBackIcon } from '@chakra-ui/icons';
 import { useSelector, useDispatch } from 'react-redux';
 import { useLocation } from 'react-router-dom';
-import { isEmpty } from 'lodash';
+import { isEmpty, slice } from 'lodash';
+import * as blazeface from '@tensorflow-models/blazeface';
 import { supabase } from '../../../supabase';
 import { clearState, selectSingleEvent, selectAttendees, appendAttendees, fetchEventById, captureFace, fetchAttendees } from '../eventSlice';
+import { draw } from '../../../util/helper';
 
 const EventAttendance = () => {
   const navigate = useNavigate();
@@ -35,11 +27,60 @@ const EventAttendance = () => {
   const attendees = useSelector(selectAttendees);
   const [imageSrc, setImageSrc] = useState(null);
   const webcamRef = React.useRef(null);
+  const canvasRef = React.useRef(null);
 
-  const videoConstraints = {
-    // width: 1280,
-    // height: 720,
+  // get media stream settings
+  const constraints = {
+    audio: false,
+    video: {
+      width: { min: 640, ideal: 1280, max: 1920 },
+      height: { min: 480, ideal: 720, max: 1080 },
+    },
     facingMode: 'user'
+  };
+
+  const runFacedetection = async () => {
+    const model = await blazeface.load();
+    console.log('FaceDetection Model is Loaded..');
+    setInterval(() => {
+      detect(model);
+    }, 3000);
+  };
+
+  const returnTensors = true;
+
+  const detect = async (model) => {
+    if (
+      typeof webcamRef.current !== 'undefined'
+      && webcamRef.current !== null
+      && webcamRef.current.video.readyState === 4
+    ) {
+      // Get video properties
+      const { video } = webcamRef.current;
+      const { videoWidth } = webcamRef.current.video;
+      const { videoHeight } = webcamRef.current.video;
+
+      // Set video height and width
+      webcamRef.current.video.width = videoWidth;
+      webcamRef.current.video.height = videoHeight;
+
+      // Set canvas height and width
+      canvasRef.current.width = videoWidth;
+      canvasRef.current.height = videoHeight;
+
+      // Make detections
+
+      const prediction = await model.estimateFaces(video, returnTensors);
+
+      console.log(prediction);
+
+      const ctx = canvasRef.current.getContext('2d');
+      draw(prediction, ctx);
+
+      if (prediction.length > 0) {
+        capture();
+      }
+    }
   };
 
   const mySubscription = async () => {
@@ -58,6 +99,7 @@ const EventAttendance = () => {
   };
 
   useEffect(() => {
+    runFacedetection();
     dispatch(clearState());
     dispatch(fetchEventById({ eventId }));
     dispatch(fetchAttendees({ eventId }));
@@ -79,75 +121,92 @@ const EventAttendance = () => {
   }, [webcamRef, setImageSrc]);
 
   return (
-    <Container maxWidth="container.xl" h="100vh">
-      <Button
-        colorScheme="white"
-        size="md"
-        variant="solid"
-        textColor="black"
-        leftIcon={<ArrowBackIcon />}
-        onClick={() => {
-          navigate('/dashboard');
-        }}
-      >
-        Go Home
-      </Button>
-      <Container minWidth="100vh">
-        <Center h="90vh">
-          <VStack alignContent="start">
-            <Box w="full" py={4}>
-              <Text fontWeight={100} fontSize="3xl" fontStyle="">{event.title}</Text>
-              <Text noOfLines={2}>{event.description}</Text>
-            </Box>
-            <Flex align="start">
-              <Box w="3/4">
-                <Webcam
-                  audio={false}
-                  // width={1280}
-                  // height={720}
-                  videoConstraints={videoConstraints}
-                  ref={webcamRef}
-                  screenshotFormat="image/jpeg"
-                />
-                <Button onClick={() => { capture(); }} variant='outline' colorScheme="teal" mt={4}>
-                  I&apos;m here 🎉!
-                </Button>
+    <Grid
+      h='200px'
+      templateRows='repeat(2, 1fr)'
+      templateColumns='repeat(3, 1fr)'
+      gap={2}
+      pt={8}
+      px={8}
+    >
+      <GridItem rowSpan={1} colSpan={3}>
+        <Button
+          colorScheme="white"
+          size="md"
+          variant="solid"
+          textColor="black"
+          leftIcon={<ArrowBackIcon />}
+          onClick={() => {
+            navigate('/dashboard');
+          }}
+        >
+          Go Home
+        </Button>
+      </GridItem>
+      <GridItem rowSpan={1} colSpan={2} bg='gray.900'>
+        <Box w="full" py={4} color='white' px={4}>
+          <Text fontWeight={100} fontSize="3xl" fontStyle="">{event.title}</Text>
+          <Text noOfLines={2}>{event.description}</Text>
+        </Box>
+        <Box w="100%" px={4}>
+          <Webcam
+            videoConstraints={constraints}
+            ref={webcamRef}
+            screenshotFormat="image/jpeg"
+            style={{
+              position: 'absolute',
+              display: 'block',
+              margin: [0, 'auto'],
+            }}
+          />
+          <canvas
+            ref={canvasRef}
+            style={{
+              position: 'absolute',
+            }}
+          />
+          {/* <Button onClick={() => { capture(); }} variant='outline' colorScheme="teal" mt={4}>
+                    I&apos;m here 🎉!
+                  </Button> */}
+        </Box>
+      </GridItem>
+      <GridItem rowSpan={1} colSpan={1}>
+        <Box
+          w="100%"
+          mx={2}
+          minHeight="90vh"
+          maxHeight="90vh"
+          overflowY={['auto', 'auto', 'auto']}
+        >
+          <Text fontWeight={100} fontSize="3xl" fontStyle="">Attendees</Text>
+          {!isEmpty(attendees) && attendees.map((attendee) => (
+            <Stack
+              flex={1}
+              w=""
+              flexDirection="row"
+              p={1}
+              px={2}
+              bg='blue.700'
+              my={2}
+              textColor="white"
+              key={attendee.id}
+            >
+              <Box alignItems=''>
+                <Text fontWeight="semibold" isTruncated>
+                  {attendee.user.firstname} {attendee.user.lastname}
+                </Text>
+                <Text isTruncated>
+                  {slice(attendee.userId, 0, 8)}
+                </Text>
+                <Text isTruncated>
+                  {attendee.user.email}
+                </Text>
               </Box>
-              <Box
-                w="1/4"
-                border
-                borderWidth="2px"
-                borderRadius="lg"
-                mx={2}
-              >
-                <Table
-                  variant='simple'
-                  size="sm"
-                >
-                  <TableCaption>Attendance</TableCaption>
-                  <Thead>
-                    <Tr>
-                      <Th>Name</Th>
-                      <Th>ID</Th>
-                      <Th>Email</Th>
-                    </Tr>
-                  </Thead>
-                  <Tbody>
-                    {!isEmpty(attendees) && attendees.map((attendee) => (
-                      <Tr key={attendee.id}>
-                        <Td><Text isTruncated>{attendee.user.firstname} {attendee.user.lastname}</Text></Td>
-                        <Td><Text isTruncated>{attendee.userId}</Text></Td>
-                        <Td><Text isTruncated>{attendee.user.email}</Text></Td>
-                      </Tr>
-                    ))}
-                  </Tbody>
-                </Table>
-              </Box>
-            </Flex>
-          </VStack>
-        </Center>
-      </Container>
-    </Container>
+            </Stack>
+          ))}
+        </Box>
+      </GridItem>
+    </Grid>
   );
 };
 
