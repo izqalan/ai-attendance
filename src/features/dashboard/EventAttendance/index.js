@@ -5,6 +5,7 @@ import {
   Grid, GridItem,
   Stack,
   useToast,
+  Text,
 } from '@chakra-ui/react';
 import Webcam from 'react-webcam';
 import { useNavigate } from 'react-router';
