@@ -13,6 +13,7 @@ import { ArrowBackIcon } from '@chakra-ui/icons';
 import { useSelector, useDispatch } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 import { isEmpty, slice } from 'lodash';
+import * as tf from '@tensorflow/tfjs';
 import * as blazeface from '@tensorflow-models/blazeface';
 import { supabase } from '../../../supabase';
 import { clearState, selectSingleEvent, selectAttendees, appendAttendees, fetchEventById, captureFace, fetchAttendees } from '../eventSlice';
