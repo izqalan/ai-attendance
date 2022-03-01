@@ -22,8 +22,12 @@ export const loginUser = createAsyncThunk(
 
 export const loginUserUsingProvider = createAsyncThunk(
   'AUTH/LOGIN_PROVIDER',
-  async (response) => {
+  async ({ provider }) => {
     try {
+      const response = await supabase.auth.signIn({
+        provider,
+      });
+      console.log('response', response);
       return response;
     } catch (error) {
       console.error('Error', error.response.data);

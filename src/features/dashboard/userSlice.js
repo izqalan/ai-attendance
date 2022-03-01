@@ -39,10 +39,9 @@ export const fetchUser = createAsyncThunk(
   async () => {
     try {
       const response = await supabase.auth.user();
-      console.log(response);
       return response;
     } catch (error) {
-      console.error('Error', error);
+      return error;
     }
   }
 );
@@ -60,14 +59,18 @@ export const userSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(fetchUser.fulfilled, (state, { payload }) => {
-        const { error } = payload;
-        if (error) {
-          state.success = false;
-          state.isLoading = false;
-        } else {
-          state.user = payload;
-          state.success = true;
-          state.isLoading = false;
+        try {
+          const { error } = payload;
+          if (error) {
+            state.success = false;
+            state.isLoading = false;
+          } else {
+            state.user = payload;
+            state.success = true;
+            state.isLoading = false;
+          }
+        } catch (error) {
+          console.error('Error', error);
         }
       })
       .addCase(fetchUser.pending, (state) => {

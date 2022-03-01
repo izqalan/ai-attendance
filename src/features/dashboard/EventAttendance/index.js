@@ -150,7 +150,7 @@ const EventAttendance = () => {
           <Text fontWeight={100} fontSize="3xl" fontStyle="">{event.title}</Text>
           <Text noOfLines={2}>{event.description}</Text>
         </Box>
-        <Box w="100%" px={4}>
+        <Box w="full" px={4}>
           <Webcam
             videoConstraints={constraints}
             ref={webcamRef}
@@ -173,6 +173,7 @@ const EventAttendance = () => {
         </Box>
       </GridItem>
       <GridItem rowSpan={1} colSpan={1}>
+        <Text mx={2} fontWeight={100} fontSize="3xl" fontStyle="">Attendees</Text>
         <Box
           w="100%"
           mx={2}
@@ -180,7 +181,6 @@ const EventAttendance = () => {
           maxHeight="90vh"
           overflowY={['auto', 'auto', 'auto']}
         >
-          <Text fontWeight={100} fontSize="3xl" fontStyle="">Attendees</Text>
           {!isEmpty(attendees) && attendees.map((attendee) => (
             <Stack
               flex={1}

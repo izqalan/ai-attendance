@@ -26,10 +26,10 @@ const LoginForm = (props) => {
   };
 
   const providerSignIn = async (provider) => {
-    const response = await supabase.auth.signIn({
-      provider,
-    });
-    dispatch(loginUserUsingProvider(response));
+    // const response = await supabase.auth.signIn({
+    //   provider,
+    // });
+    dispatch(loginUserUsingProvider({ provider }));
   };
 
   if (success && !isEmpty(authData)) {
