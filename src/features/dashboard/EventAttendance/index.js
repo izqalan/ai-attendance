@@ -104,8 +104,7 @@ const EventAttendance = () => {
             title: 'Attendance taken',
             body: `You recently attended ${event.title} at `,
           };
-          const noti = await sendPushNotification(message);
-          console.log(noti);
+          sendPushNotification(message);
         }
       })
       .subscribe();
