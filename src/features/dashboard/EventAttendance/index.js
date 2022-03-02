@@ -96,8 +96,31 @@ const EventAttendance = () => {
           user:userId(*)
         `).eq('id', data.new.id);
         dispatch(appendAttendees(response.data[0]));
+
+        if (response.data[0].user.userToken !== null) {
+          const message = {
+            to: response.data[0].user.userToken,
+            sound: 'default',
+            title: 'Attendance taken',
+            body: `You recently attended ${event.title} at `,
+          };
+          const noti = await sendPushNotification(message);
+          console.log(noti);
+        }
       })
       .subscribe();
+  };
+
+  const sendPushNotification = async (message) => {
+    await fetch('https://exp.host/--/api/v2/push/send', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Accept-encoding': 'gzip, deflate',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(message),
+    });
   };
 
   useEffect(() => {
@@ -168,7 +191,7 @@ const EventAttendance = () => {
             }}
           />
           {/* <Button onClick={() => { capture(); }} variant='outline' colorScheme="teal" mt={4}>
-                    I&apos;m here 🎉!
+                    I&apos;moment here 🎉!
                   </Button> */}
         </Box>
       </GridItem>
