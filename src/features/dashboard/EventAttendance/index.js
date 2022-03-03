@@ -15,9 +15,12 @@ import { useLocation } from 'react-router-dom';
 import { isEmpty, slice } from 'lodash';
 import * as tf from '@tensorflow/tfjs';
 import * as blazeface from '@tensorflow-models/blazeface';
+import AWS from 'aws-sdk';
+import moment from 'moment';
 import { supabase } from '../../../supabase';
 import { clearState, selectSingleEvent, selectAttendees, appendAttendees, fetchEventById, captureFace, fetchAttendees } from '../eventSlice';
 import { draw } from '../../../util/helper';
+import config from '../../../util/aws-config';
 
 const EventAttendance = () => {
   const navigate = useNavigate();
@@ -30,6 +33,15 @@ const EventAttendance = () => {
   const [imageSrc, setImageSrc] = useState(null);
   const webcamRef = React.useRef(null);
   const canvasRef = React.useRef(null);
+  const [isModelReady, setIsModelReady] = useState(false);
+
+  AWS.config.update({
+    accessKeyId: config.accessKeyId,
+    secretAccessKey: config.secretAccessKey,
+    region: config.region,
+  });
+
+  const lambda = new AWS.Lambda();
 
   // get media stream settings
   const constraints = {
@@ -43,10 +55,10 @@ const EventAttendance = () => {
 
   const runFacedetection = async () => {
     const model = await blazeface.load();
-    console.log('FaceDetection Model is Loaded..');
+    setIsModelReady(true);
     setInterval(() => {
       detect(model);
-    }, 3000);
+    }, 5000);
   };
 
   const returnTensors = true;
@@ -74,8 +86,6 @@ const EventAttendance = () => {
 
       const prediction = await model.estimateFaces(video, returnTensors);
 
-      console.log(prediction);
-
       const ctx = canvasRef.current.getContext('2d');
       draw(prediction, ctx);
 
@@ -96,13 +106,12 @@ const EventAttendance = () => {
           user:userId(*)
         `).eq('id', data.new.id);
         dispatch(appendAttendees(response.data[0]));
-
-        if (response.data[0].user.userToken !== null) {
+        if (response.data[0].user.deviceToken !== null) {
           const message = {
-            to: response.data[0].user.userToken,
+            to: response.data[0].user.deviceToken,
             sound: 'default',
-            title: 'Attendance taken',
-            body: `You recently attended ${event.title} at `,
+            title: 'Attendance taken!',
+            body: `You recently attended ${event.title} at ${moment(event.createdAt).format('Do MMMM YYYY, h:mm:ss a')}`,
           };
           sendPushNotification(message);
         }
@@ -111,14 +120,15 @@ const EventAttendance = () => {
   };
 
   const sendPushNotification = async (message) => {
-    await fetch('https://exp.host/--/api/v2/push/send', {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Accept-encoding': 'gzip, deflate',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(message),
+    lambda.invoke({
+      FunctionName: 'sendNotification',
+      Payload: JSON.stringify(message),
+    }, (err, data) => {
+      if (err) {
+        console.log(err);
+      } else {
+        console.log(data);
+      }
     });
   };
 
@@ -172,27 +182,27 @@ const EventAttendance = () => {
           <Text fontWeight={100} fontSize="3xl" fontStyle="">{event.title}</Text>
           <Text noOfLines={2}>{event.description}</Text>
         </Box>
-        <Box w="full" px={4}>
-          <Webcam
-            videoConstraints={constraints}
-            ref={webcamRef}
-            screenshotFormat="image/jpeg"
-            style={{
-              position: 'absolute',
-              display: 'block',
-              margin: [0, 'auto'],
-            }}
-          />
-          <canvas
-            ref={canvasRef}
-            style={{
-              position: 'absolute',
-            }}
-          />
-          {/* <Button onClick={() => { capture(); }} variant='outline' colorScheme="teal" mt={4}>
-                    I&apos;moment here 🎉!
-                  </Button> */}
-        </Box>
+        {isModelReady && (
+          <Box w="full" px={4}>
+            <Webcam
+              videoConstraints={constraints}
+              ref={webcamRef}
+              screenshotFormat="image/jpeg"
+              style={{
+                position: 'absolute',
+                display: 'block',
+                margin: [0, 'auto'],
+              }}
+            />
+            <canvas
+              ref={canvasRef}
+              style={{
+                position: 'absolute',
+              }}
+            />
+          </Box>
+        )}
+
       </GridItem>
       <GridItem rowSpan={1} colSpan={1}>
         <Text mx={2} fontWeight={100} fontSize="3xl" fontStyle="">Attendees</Text>

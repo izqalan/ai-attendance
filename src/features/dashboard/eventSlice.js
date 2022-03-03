@@ -1,6 +1,7 @@
 /* eslint-disable prefer-destructuring */
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import AWS from 'aws-sdk';
+import { isEmpty } from 'lodash';
 import { supabase } from '../../supabase';
 import config from '../../util/aws-config';
 
@@ -105,13 +106,13 @@ export const captureFace = createAsyncThunk(
           };
         }
         response = data;
-
-        const detectedUserId = response.FaceMatches[0].Face.ExternalImageId;
-        await supabase
-          .from('UsersEvents')
-          .insert([{ eventId, userId: detectedUserId, isAttended: true }]);
+        if (!isEmpty(response)) {
+          const detectedUserId = response.FaceMatches[0].Face.ExternalImageId;
+          await supabase
+            .from('UsersEvents')
+            .insert([{ eventId, userId: detectedUserId, isAttended: true }]);
+        }
       });
-      console.log(response);
       return response;
     } catch (error) {
       console.log(error);
