@@ -6,6 +6,10 @@ import {
   Stack,
   useToast,
   Text,
+  useDisclosure,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
 } from '@chakra-ui/react';
 import Webcam from 'react-webcam';
 import { useNavigate } from 'react-router';
@@ -18,22 +22,26 @@ import * as blazeface from '@tensorflow-models/blazeface';
 import AWS from 'aws-sdk';
 import moment from 'moment';
 import { supabase } from '../../../supabase';
-import { clearState, selectSingleEvent, selectAttendees, appendAttendees, fetchEventById, captureFace, fetchAttendees } from '../eventSlice';
+import { clearState, selectCurrentAttendee, selectSingleEvent, selectAttendees, appendAttendees, fetchEventById, captureFace, fetchAttendees, confirmAttendance } from '../eventSlice';
 import { draw } from '../../../util/helper';
 import config from '../../../util/aws-config';
+import BasicModal from '../components/Modal';
 
 const EventAttendance = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
   const { search } = useLocation();
   const eventId = new URLSearchParams(search).get('event_id');
   const event = useSelector(selectSingleEvent);
   const attendees = useSelector(selectAttendees);
+  const currentAttendee = useSelector(selectCurrentAttendee);
   const [imageSrc, setImageSrc] = useState(null);
   const webcamRef = React.useRef(null);
   const canvasRef = React.useRef(null);
   const [isModelReady, setIsModelReady] = useState(false);
+  const [isCurrentlyTakingAttendance, setIsCurrentlyTakingAttendance] = useState(false);
 
   AWS.config.update({
     accessKeyId: config.accessKeyId,
@@ -89,7 +97,7 @@ const EventAttendance = () => {
       const ctx = canvasRef.current.getContext('2d');
       draw(prediction, ctx);
 
-      if (prediction.length > 0) {
+      if (prediction.length > 0 && !isCurrentlyTakingAttendance) {
         capture();
       }
     }
@@ -142,17 +150,35 @@ const EventAttendance = () => {
 
   const capture = React.useCallback(() => {
     const img = webcamRef.current.getScreenshot();
+    setIsCurrentlyTakingAttendance(true);
+    // pause camera
+    webcamRef.current.video.pause();
+    // webcamRef.current.video.srcObject.getVideoTracks().forEach(track => track.stop());
+
     setImageSrc(img);
     dispatch(captureFace({ eventId, imageSrc: img })).then(() => {
-      toast({
-        title: 'Success',
-        description: 'Picture taken',
-        status: 'success',
-        duration: 3000,
-        isClosable: true,
-      });
+      onOpen();
     });
   }, [webcamRef, setImageSrc]);
+
+  const confirmAttendance = async () => {
+    console.log(currentAttendee);
+    const userId = currentAttendee.id;
+    supabase
+      .from('UsersEvents')
+      .insert([{ eventId, userId, isAttended: true }]).then(() => {
+        toast({
+          title: 'Success',
+          description: 'Picture taken',
+          status: 'success',
+          duration: 3000,
+          isClosable: true,
+        });
+        onClose();
+        setIsCurrentlyTakingAttendance(false);
+        webcamRef.current.video.play();
+      });
+  };
 
   return (
     <Grid
@@ -163,6 +189,29 @@ const EventAttendance = () => {
       pt={8}
       px={8}
     >
+      <BasicModal
+        isOpen={isOpen}
+        onClose={onClose}
+        closeOnOverlayClick={false}
+      >
+        <ModalHeader>Confirmation</ModalHeader>
+        <ModalBody>
+          <Text>Are you {currentAttendee?.firstname} {currentAttendee?.lastname} ?</Text>
+          <Text>{currentAttendee?.id}</Text>
+        </ModalBody>
+        <ModalFooter>
+          <Button variant='ghost' mr={3} onClick={onClose}>
+            No, this is not me
+          </Button>
+          <Button
+            colorScheme='green'
+            onClick={() => {
+              confirmAttendance();
+            }}
+          >Yes, that is me!
+          </Button>
+        </ModalFooter>
+      </BasicModal>
       <GridItem rowSpan={1} colSpan={3}>
         <Button
           colorScheme="white"
@@ -226,6 +275,7 @@ const EventAttendance = () => {
               key={attendee.id}
             >
               <Box alignItems=''>
+                <Text fontSize="xs" fontWeight="bold">{moment(attendee.createdAt).format('Do MMMM YYYY, h:mm:ss a')}</Text>
                 <Text fontWeight="semibold" isTruncated>
                   {attendee.user.firstname} {attendee.user.lastname}
                 </Text>

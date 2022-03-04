@@ -27,7 +27,6 @@ export const loginUserUsingProvider = createAsyncThunk(
       const response = await supabase.auth.signIn({
         provider,
       });
-      console.log('response', response);
       return response;
     } catch (error) {
       console.error('Error', error.response.data);
@@ -90,7 +89,6 @@ export const authSlice = createSlice({
         state.isLoading = false;
       })
       .addCase(loginUserUsingProvider.fulfilled, (state, { payload }) => {
-        console.log('payload', payload);
         const { error } = payload;
         if (error) {
           state.data = null;

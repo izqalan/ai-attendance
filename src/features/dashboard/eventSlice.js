@@ -59,7 +59,8 @@ export const fetchAttendees = createAsyncThunk(
         .select(`
           *,
           user:userId(*)
-        `).eq('eventId', eventId);
+        `).eq('eventId', eventId)
+        .order('createdAt', { ascending: true });
       return response;
     } catch (error) {
       return error;
@@ -84,35 +85,49 @@ export const fetchEventById = createAsyncThunk(
   }
 );
 
+// capture user face but not saving attendance record to db yet
 export const captureFace = createAsyncThunk(
   'EVENT/CAPTURE_FACE',
-  async ({ eventId, imageSrc }) => {
+  async ({ imageSrc }) => {
+    console.log('capurture face');
     try {
       const rekognition = new AWS.Rekognition();
+      let response = {};
       // eslint-disable-next-line new-cap
       const buffer = new Buffer.from(imageSrc.replace(/^data:image\/\w+;base64,/, ''), 'base64');
-      let response = {};
-      rekognition.searchFacesByImage({
+      const rekognitionResponse = await rekognition.searchFacesByImage({
         CollectionId: 'uniten-faces',
         MaxFaces: 1,
         FaceMatchThreshold: 70,
         Image: {
           Bytes: buffer
         },
-      }, async (err, data) => {
-        if (err) {
-          response = {
-            error: err,
-          };
-        }
-        response = data;
-        if (!isEmpty(response)) {
-          const detectedUserId = response.FaceMatches[0].Face.ExternalImageId;
-          await supabase
-            .from('UsersEvents')
-            .insert([{ eventId, userId: detectedUserId, isAttended: true }]);
-        }
-      });
+      }).promise();
+
+      if (rekognitionResponse.FaceMatches.length > 0) {
+        const detectedUserId = rekognitionResponse.FaceMatches[0].Face.ExternalImageId;
+        response = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', detectedUserId)
+        .limit(1)
+        .single();
+      }
+      return response;
+    } catch (error) {
+      return error;
+    }
+  }
+);
+
+// not sure why this cause infinite recursion
+export const confirmAttendance = createAsyncThunk(
+  'EVENT/CONFIRM_ATTENDANCE',
+  async ({ eventId, userId }) => {
+    try {
+      const response = await supabase
+        .from('UsersEvents')
+        .insert([{ eventId, userId, isAttended: true }]);
       return response;
     } catch (error) {
       console.log(error);
@@ -130,6 +145,7 @@ export const eventSlice = createSlice({
       state.success = false;
       state.isLoading = false;
       state.attendees = null;
+      // state.currentAttendee = null;
     },
     appendAttendees: (state, action) => {
       state.attendees = state.attendees.concat(action.payload);
@@ -194,11 +210,12 @@ export const eventSlice = createSlice({
         state.isLoading = true;
       })
       .addCase(captureFace.fulfilled, (state, { payload }) => {
-        const { error } = payload;
+        const { error, data } = payload;
         if (error) {
           state.success = false;
           state.isLoading = false;
         } else {
+          state.currentAttendee = data;
           state.success = true;
           state.isLoading = false;
         }
@@ -208,6 +225,25 @@ export const eventSlice = createSlice({
         state.isLoading = true;
       })
       .addCase(captureFace.rejected, (state) => {
+        state.success = false;
+        state.isLoading = true;
+      })
+      .addCase(confirmAttendance.fulfilled, (state, { payload }) => {
+        const { error, data } = payload;
+        if (error) {
+          state.success = false;
+          state.isLoading = false;
+        } else {
+          state.data = data;
+          state.success = true;
+          state.isLoading = false;
+        }
+      })
+      .addCase(confirmAttendance.pending, (state) => {
+        state.success = false;
+        state.isLoading = true;
+      })
+      .addCase(confirmAttendance.rejected, (state) => {
         state.success = false;
         state.isLoading = true;
       })
@@ -233,5 +269,5 @@ export const selectUserSuccess = (state) => state.event.success;
 export const selectUserIsLoading = (state) => state.event.isLoading;
 export const selectSingleEvent = (state) => state.event.event;
 export const selectAttendees = (state) => state.event.attendees;
-
+export const selectCurrentAttendee = (state) => state.event.currentAttendee;
 export default eventSlice.reducer;
