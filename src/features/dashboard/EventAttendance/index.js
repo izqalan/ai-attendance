@@ -152,7 +152,7 @@ const EventAttendance = () => {
     const img = webcamRef.current.getScreenshot();
     setIsCurrentlyTakingAttendance(true);
     // pause camera
-    webcamRef.current.video.pause();
+    // webcamRef.current.video.pause();
     // webcamRef.current.video.srcObject.getVideoTracks().forEach(track => track.stop());
 
     setImageSrc(img);
@@ -162,7 +162,6 @@ const EventAttendance = () => {
   }, [webcamRef, setImageSrc]);
 
   const confirmAttendance = async () => {
-    console.log(currentAttendee);
     const userId = currentAttendee.id;
     supabase
       .from('UsersEvents')
@@ -176,7 +175,7 @@ const EventAttendance = () => {
         });
         onClose();
         setIsCurrentlyTakingAttendance(false);
-        webcamRef.current.video.play();
+        // webcamRef.current.video.play();
       });
   };
 
