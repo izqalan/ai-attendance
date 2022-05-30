@@ -6,7 +6,10 @@ const initialState = {
   data: null,
   success: false,
   isLoading: false,
+  error: null,
 };
+
+const ATTENDEES_NOT_ALLOWED = 'Attendees are not allowed to access this page.';
 
 export const loginUser = createAsyncThunk(
   'AUTH/LOGIN',
@@ -64,16 +67,26 @@ export const authSlice = createSlice({
       state.data = null;
       state.success = false;
       state.isLoading = false;
+      state.error = null;
+    },
+    clearError: (state) => {
+      state.error = null;
     },
   },
   extraReducers: (builder) => {
     builder
       .addCase(loginUser.fulfilled, (state, { payload }) => {
-        const { error } = payload;
+        const { error, user } = payload;
+        
         if (error) {
           state.data = null;
           state.success = false;
           state.isLoading = false;
+        } else if (user.user_metadata.role === 'attendee') {
+          state.data = null;
+          state.success = false;
+          state.isLoading = false;
+          state.error = { message: ATTENDEES_NOT_ALLOWED };
         } else {
           state.data = payload;
           state.success = true;
@@ -89,11 +102,16 @@ export const authSlice = createSlice({
         state.isLoading = false;
       })
       .addCase(loginUserUsingProvider.fulfilled, (state, { payload }) => {
-        const { error } = payload;
+        const { error, user } = payload;
         if (error) {
           state.data = null;
           state.success = false;
           state.isLoading = false;
+        } else if (user.user_metadata.role === 'attendee') {
+          state.data = null;
+          state.success = false;
+          state.isLoading = false;
+          state.error = { message: ATTENDEES_NOT_ALLOWED };
         } else {
           state.data = payload;
           state.success = true;
@@ -139,7 +157,10 @@ export const authSlice = createSlice({
 
 // export const { logout } = authSlice.actions;
 
+export const { clearState, clearError } = authSlice.actions;
+
 export const selectAuthData = (state) => state.auth.data;
 export const selectAuthSuccess = (state) => state.auth.success;
+export const selectAuthError = (state) => state.auth.error;
 
 export default authSlice.reducer;

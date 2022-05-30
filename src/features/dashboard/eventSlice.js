@@ -89,7 +89,6 @@ export const fetchEventById = createAsyncThunk(
 export const captureFace = createAsyncThunk(
   'EVENT/CAPTURE_FACE',
   async ({ imageSrc }) => {
-    console.log('capurture face');
     try {
       const rekognition = new AWS.Rekognition();
       let response = {};
@@ -130,7 +129,6 @@ export const confirmAttendance = createAsyncThunk(
         .insert([{ eventId, userId, isAttended: true }]);
       return response;
     } catch (error) {
-      console.log(error);
       return error;
     }
   }

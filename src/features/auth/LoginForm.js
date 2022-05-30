@@ -1,12 +1,12 @@
 /* eslint-disable import/named */
 /* eslint-disable react/react-in-jsx-scope */
+import { useEffect } from 'react';
 import { Button, chakra, FormControl, FormLabel, Input, Stack, useToast, Icon, Tooltip } from '@chakra-ui/react';
 import { useDispatch, useSelector } from 'react-redux';
 import { isEmpty } from 'lodash';
 import { Navigate } from 'react-router-dom';
 import { PasswordField } from './PasswordField';
-import { loginUser, loginUserUsingProvider, selectAuthSuccess, selectAuthData } from './authSlice';
-import { supabase } from '../../supabase';
+import { clearError, loginUser, loginUserUsingProvider, selectAuthSuccess, selectAuthData, selectAuthError } from './authSlice';
 
 const LoginForm = (props) => {
   // const emailRef = useRef();
@@ -14,6 +14,12 @@ const LoginForm = (props) => {
   const dispatch = useDispatch();
   const success = useSelector(selectAuthSuccess);
   const authData = useSelector(selectAuthData);
+  const authError = useSelector(selectAuthError);
+  
+  useEffect(() => {
+    dispatch(clearError());
+  }, []);
+
   const toast = useToast();
   if (authData !== null) {
     return <Navigate to={{ pathname: '/dashboard' }} />;
@@ -37,6 +43,14 @@ const LoginForm = (props) => {
       title: 'Success',
       description: 'User Logged in.',
       status: 'success',
+      duration: 3000,
+      isClosable: true,
+    });
+  } else if (authError?.message != null && !success) {
+    toast({
+      title: 'Error',
+      description: authError?.message,
+      status: 'error',
       duration: 3000,
       isClosable: true,
     });
