@@ -29,6 +29,10 @@ export const loginUserUsingProvider = createAsyncThunk(
     try {
       const response = await supabase.auth.signIn({
         provider,
+      }, {
+        data: { 
+          role: 'creator' 
+        }
       });
       return response;
     } catch (error) {
@@ -41,7 +45,11 @@ export const signUp = createAsyncThunk(
   'AUTH/SIGNUP',
   async ({ email, password }) => {
     try {
-      await supabase.auth.signUp({ email, password });
+      await supabase.auth.signUp({ email, password }, {
+        data: { 
+          role: 'creator' 
+        }
+      });
     } catch (error) {
       console.error('Error', error.response.data);
     }
