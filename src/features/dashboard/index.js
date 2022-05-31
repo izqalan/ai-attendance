@@ -67,7 +67,7 @@ const Dashboard = () => {
 
   return (
     <>
-      <Box bg={useColorModeValue('gray.50', 'gray.900')} shadow="md" px={4}>
+      <Box bg={useColorModeValue('blue.500', 'white')} shadow="md" px={4}>
         <Flex h={16} alignItems="center" justifyContent="space-between">
           <IconButton
             size="md"
@@ -77,7 +77,7 @@ const Dashboard = () => {
             onClick={isOpen ? onClose : onOpen}
           />
           <HStack spacing={8} alignItems="center">
-            <Box>Logo</Box>
+            <Box color="white" fontWeight="bold">UNITEN</Box>
             <HStack
               as="nav"
               spacing={4}
@@ -89,9 +89,11 @@ const Dashboard = () => {
                 rounded="md"
                 _hover={{
                   textDecoration: 'none',
-                  bg: useColorModeValue('gray.200', 'gray.700'),
+                  bg: 'gray.50',
+                  color: 'gray.800'
                 }}
                 href="#"
+                color="white"
               >
                 About
               </Link>
