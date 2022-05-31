@@ -193,23 +193,64 @@ const EventAttendance = () => {
         onClose={onClose}
         closeOnOverlayClick={false}
       >
-        <ModalHeader>Confirmation</ModalHeader>
-        <ModalBody>
-          <Text>Are you {currentAttendee?.firstname} {currentAttendee?.lastname} ?</Text>
-          <Text>{currentAttendee?.id}</Text>
-        </ModalBody>
-        <ModalFooter>
-          <Button variant='ghost' mr={3} onClick={onClose}>
-            No, this is not me
-          </Button>
-          <Button
-            colorScheme='green'
-            onClick={() => {
-              confirmAttendance();
-            }}
-          >Yes, that is me!
-          </Button>
-        </ModalFooter>
+        {currentAttendee?.error && currentAttendee?.error.type === 'NOFACE'
+          && (
+            <>
+              <ModalHeader>Error</ModalHeader>
+              <ModalBody>
+                <Text>The system doesn&#39;t appear to recognize your face.</Text>
+                <Text>Please upload you face using the app and try again.</Text>
+              </ModalBody>
+              <ModalFooter>
+                <Button
+                  variant='ghost'
+                  mr={3}
+                  onClick={() => {
+                    onClose();
+                  }}
+                >
+                  Close
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        {currentAttendee && !currentAttendee.error && (
+          <div>
+            <ModalHeader>Confirmation</ModalHeader>
+            <ModalBody>
+
+              {currentAttendee?.firstname && (
+                <>
+                  <Text>Are you {currentAttendee?.firstname} {currentAttendee?.lastname} ?</Text>
+                  <Text>{currentAttendee?.id}</Text>
+                </>
+              )}
+
+              {!currentAttendee?.firstname && currentAttendee.id && (
+                <Text>Attendence taken for {currentAttendee?.id}</Text>
+              )}
+            </ModalBody>
+            <ModalFooter>
+              <Button
+                variant='ghost'
+                mr={3}
+                onClick={() => {
+                  onClose();
+                }}
+              >
+                No, this is not me
+              </Button>
+              <Button
+                colorScheme='green'
+                onClick={() => {
+                  confirmAttendance();
+                }}
+              >Yes, that is me!
+              </Button>
+            </ModalFooter>
+          </div>
+        )}
+
       </BasicModal>
       <GridItem rowSpan={1} colSpan={3}>
         <Button

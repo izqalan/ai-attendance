@@ -111,6 +111,13 @@ export const captureFace = createAsyncThunk(
         .eq('id', detectedUserId)
         .limit(1)
         .single();
+      } else if (rekognitionResponse.FaceMatches.length === 0) {
+        response = {
+          error: {
+            type: 'NOFACE',
+            message: 'No face detected'
+          }
+        };
       }
       return response;
     } catch (error) {
@@ -212,6 +219,7 @@ export const eventSlice = createSlice({
         if (error) {
           state.success = false;
           state.isLoading = false;
+          state.currentAttendee = payload;
         } else {
           state.currentAttendee = data;
           state.success = true;
