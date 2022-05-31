@@ -21,7 +21,7 @@ import {
   Center,
   Text,
   Wrap,
-  Spacer 
+  Spacer
 } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
 import { HamburgerIcon, CloseIcon, AddIcon, ArrowUpIcon } from '@chakra-ui/icons';
@@ -42,6 +42,10 @@ const Dashboard = () => {
   const userCreatedEvents = filter(useSelector(selectEvents), event => event.user.email === user.email);
   const gotoChangePassword = () => {
     navigate('/change-password');
+  };
+
+  const gotoChangeName = () => {
+    navigate('/change-name');
   };
 
   const handleLogout = () => {
@@ -109,6 +113,7 @@ const Dashboard = () => {
                 />
               </MenuButton>
               <MenuList>
+                <MenuItem onClick={() => gotoChangeName()}>Change Name</MenuItem>
                 <MenuItem onClick={() => gotoChangePassword()}>Change Password</MenuItem>
                 <MenuDivider />
                 <MenuItem onClick={() => handleLogout()}>Logout</MenuItem>

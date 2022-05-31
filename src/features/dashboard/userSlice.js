@@ -7,6 +7,7 @@ const initialState = {
   user: null,
   success: false,
   isLoading: false,
+  profile: null,
 };
 
 export const updateUserAuth = createAsyncThunk(
@@ -46,6 +47,40 @@ export const fetchUser = createAsyncThunk(
   }
 );
 
+export const updateUserName = createAsyncThunk(
+  // update first and last name
+  'USER/UPDATE_NAME',
+  async ({ userId, payload }) => {
+    try {
+      console.log(userId, payload);
+      const response = await supabase
+        .from('users')
+        .update({ firstname: payload.firstname, lastname: payload.lastname })
+        .eq('id', userId);
+      return response;
+    } catch (error) {
+      console.error('Error', error);
+    }
+  }
+);
+
+export const fetchUserProfile = createAsyncThunk(
+  // fetch first and last name
+  'USER/FETCH_PROFILE',
+  async (userId) => {
+    try {
+      const response = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', userId)
+        .single();
+      return response;
+    } catch (error) {
+      console.error('Error', error);
+    }
+  }
+);
+
 export const userSlice = createSlice({
   name: 'USER',
   initialState,
@@ -58,6 +93,48 @@ export const userSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      .addCase(fetchUserProfile.fulfilled, (state, { payload }) => {
+        const { error, data } = payload;
+        if (error) {
+          state.success = false;
+          state.isLoading = false;
+        } else {
+          state.success = true;
+          state.isLoading = false;
+          state.profile = data;
+        }
+      })
+      .addCase(fetchUserProfile.pending, (state) => {
+        state.success = false;
+        state.isLoading = true;
+      })
+      .addCase(fetchUserProfile.rejected, (state) => {
+        state.success = false;
+        state.isLoading = true;
+      })
+      .addCase(updateUserName.fulfilled, (state, { payload }) => {
+        const { error, data } = payload;
+        if (error) {
+          state.success = false;
+          state.isLoading = false;
+        } else {
+          state.success = true;
+          state.isLoading = false;
+          state.profile = {
+            ...state.profile,
+            firstname: data[0].firstname,
+            lastname: data[0].lastname,
+          };
+        }
+      })
+      .addCase(updateUserName.pending, (state) => {
+        state.success = false;
+        state.isLoading = true;
+      })
+      .addCase(updateUserName.rejected, (state) => {
+        state.success = false;
+        state.isLoading = true;
+      })
       .addCase(fetchUser.fulfilled, (state, { payload }) => {
         try {
           const { error } = payload;
@@ -125,5 +202,6 @@ export const selectUser = (state) => state.user.auth;
 export const selectUserData = (state) => state.user.user;
 export const selectUserSuccess = (state) => state.user.success;
 export const selectUserIsLoading = (state) => state.user.isLoading;
+export const selectUserProfile = (state) => state.user.profile;
 
 export default userSlice.reducer;

@@ -10,6 +10,7 @@ import SignUp from './features/auth/SignUp';
 import Dashboard from './features/dashboard';
 import EventAttendance from './features/dashboard/EventAttendance/index';
 import ResetPassword from './features/dashboard/ResetPassword';
+import ChangeName from './features/dashboard/ChangeName';
 import { selectAuthData } from './features/auth/authSlice';
 import './styles/main.css';
 
@@ -34,6 +35,10 @@ const App = function app() {
           <Route
             path="/change-password"
             element={<ResetPassword />}
+          />
+          <Route
+            path="/change-name"
+            element={<ChangeName />}
           />
           <Route
             exact
