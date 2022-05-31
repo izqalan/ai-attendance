@@ -38,7 +38,6 @@ const ChangeName = () => {
     }
   }, []);
 
-  console.log(profile);
   if (success && !isLoading) {
     toast({
       title: 'Success',

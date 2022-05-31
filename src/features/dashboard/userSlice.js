@@ -52,7 +52,6 @@ export const updateUserName = createAsyncThunk(
   'USER/UPDATE_NAME',
   async ({ userId, payload }) => {
     try {
-      console.log(userId, payload);
       const response = await supabase
         .from('users')
         .update({ firstname: payload.firstname, lastname: payload.lastname })
